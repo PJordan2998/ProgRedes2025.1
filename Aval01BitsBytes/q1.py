@@ -6,9 +6,9 @@ ip_num = 0
 for parte in ip.split('.'):
     ip_num = (ip_num << 8) + int(parte)
 
-<<<<<<< HEAD
 mascara = (0xFFFFFFFF << (32 - bits)) & 0xFFFFFFFF if bits > 0 else 0
 
+rede = ip_num & mascara
+broadcast = rede | (~mascara & 0xFFFFFFFF)
+gateway = broadcast - 1 if bits < 31 else broadcast
 
-=======
->>>>>>> 6025364beef561228aa5ddba4c34976bf24f2d19
