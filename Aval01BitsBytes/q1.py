@@ -12,3 +12,19 @@ rede = ip_num & mascara
 broadcast = rede | (~mascara & 0xFFFFFFFF)
 gateway = broadcast - 1 if bits < 31 else broadcast
 
+if bits == 32:
+    hosts = 1
+elif bits == 31:
+    hosts = 2
+else:
+    hosts = (1 << (32 - bits)) - 2
+
+def num_para_ip(num):
+    return '.'.join(str((num >> shift) & 0xFF) for shift in (24, 16, 8, 0))
+
+print("\nResultados:")
+print(f"Rede:       {num_para_ip(rede)}")
+print(f"Broadcast:  {num_para_ip(broadcast)}")
+print(f"Gateway:    {num_para_ip(gateway)}")
+print(f"Hosts:      {hosts}")
+
