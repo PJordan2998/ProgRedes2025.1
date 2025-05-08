@@ -17,3 +17,9 @@ for texto, bits in testes:
     alvo = 1 << (256 - bits)
     inicio = time.time()
     nonce = 0
+
+ while True:
+        dados = nonce.to_bytes(4, 'big') + texto.encode()
+        hash_resultado = hashlib.sha256(dados).digest()
+        valor_hash = int.from_bytes(hash_resultado, 'big')
+        
