@@ -1,4 +1,4 @@
-#Entrada do número ip e máscara da rede#
+#Solicitação do ip da rede e dos bits da máscara de rede ao usuário#
 ip = input("Digite o endereço IPv4 ").strip()
 bits = int(input("Digite a máscara em bits (ex: 24): ").strip())
 
@@ -22,7 +22,6 @@ else:
 def num_para_ip(num):
     return '.'.join(str((num >> shift) & 0xFF) for shift in (24, 16, 8, 0))
 
-print("\nResultados:")
 print(f"Rede:       {num_para_ip(rede)}")
 print(f"Broadcast:  {num_para_ip(broadcast)}")
 print(f"Gateway:    {num_para_ip(gateway)}")
