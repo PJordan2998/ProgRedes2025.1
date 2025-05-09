@@ -1,5 +1,4 @@
-import hashlib
-import time
+import hashlib, time
 
 testes = [
     ("Texto curto", 8),
