@@ -15,3 +15,7 @@ def principal():
     
     for texto, bits in tabela:
         dados = texto.encode('utf-8')
+        nonce, hash_hex, tempo = findNonce(dados, bits)
+        
+        texto_tabela = texto if len(texto) <= 30 else texto[:17] + "..."
+        print(f"{texto_tabela:<25} {bits:<10} {nonce:<15} {tempo:.6f}")
