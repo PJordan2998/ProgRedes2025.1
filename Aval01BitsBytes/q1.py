@@ -2,7 +2,7 @@
 ip = input("Digite o endereço IPv4 ").strip()
 bits = int(input("Digite a máscara em bits: ").strip())
 
-# Conversão do IP da rede para número inteiro #
+# Conversão do IP da rede para número inteiro, através de laço for, separando os quatro octetos, por pontos #
 ip_num = 0
 for parte in ip.split('.'):
     ip_num = (ip_num << 8) + int(parte)
