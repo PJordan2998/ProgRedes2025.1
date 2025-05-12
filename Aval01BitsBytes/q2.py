@@ -36,7 +36,7 @@ def contar_bits_zero_iniciais(bytes_hash):
     contador = 0
     for byte in bytes_hash:
     
-# Caso o byte for 0x00, então todos os 8 bits são zero → soma 8 ao contador #
+# Se o byte for 0x00, então todos os 8 bits são zero → soma 8 ao contador #
         if byte == 0:
             contador += 8
         else:
@@ -50,3 +50,28 @@ def contar_bits_zero_iniciais(bytes_hash):
 
 # Retorna o número total de bits zero consecutivos no início do hash #
     return contador
+
+# Encontra um nonce que faz o hash começar com a quantidade especificada de bits zero #
+def findNonce(dataToHash, bitsToBeZero):
+
+# Marca o tempo de início da busca #
+    tempo_inicial = time.time()
+    nonce = 0
+
+# Laço infinito até encontrar um nonce válido #
+    while True:
+# Prepara os nonce de 4 bytes big-endian + dados #
+        dados_nonce = struct.pack('>I', nonce) + dataToHash
+        
+# Calcula o hash #
+        result_hash = hashlib.sha256(dados_nonce).digest()
+        
+# Verificação dos bits zero iniciais #
+        if contar_bits_zero_iniciais(result_hash) >= bitsToBeZero:
+            tempo_de_execucao = time.time() - tempo_inicial
+            return (nonce, result_hash.hex(), tempo_de_execucao)
+        nonce += 1
+
+# Inicia a função principal, caso o programa seja exacutado corretamente #
+if __name__ == "__main__":
+    principal()
