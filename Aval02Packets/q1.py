@@ -61,7 +61,8 @@ with open(nome_arquivo, 'rb') as arquivo_pcap:
 #  ARP / RARP #
 # Se for protocolo ARP (0x0806), extrai: Operação (1 = request, 2 = reply) e MAC e IP do remetente e destinatário #
         if tipo_ethernet == 0x0806 and len(dados_rede) >= 28:
-            codigo_operacao = struct.unpack('!H', dados_rede[6:8])[0]  # Código ARP ou RARP
+# Código ARP ou RARP #
+            codigo_operacao = struct.unpack('!H', dados_rede[6:8])[0]  
             remetente_mac = ':'.join('{:02x}'.format(b) for b in dados_rede[8:14])
             remetente_ip = '.'.join(str(b) for b in dados_rede[14:18])
             destinatario_mac = ':'.join('{:02x}'.format(b) for b in dados_rede[18:24])
@@ -73,6 +74,7 @@ with open(nome_arquivo, 'rb') as arquivo_pcap:
             print(f"  ➜ Destinatário      : MAC {destinatario_mac}, IP {destinatario_ip}")
 
 #  IPv4 #
+# Se for protocolo IPv4 (0x0800), extrai dados #
         elif tipo_ethernet == 0x0800 and len(dados_rede) >= 20:
 # Versão e tamanho do cabeçalho #
             versao_ihl = dados_rede[0]
@@ -95,3 +97,61 @@ with open(nome_arquivo, 'rb') as arquivo_pcap:
             print(f"  ➜ TTL          : {tempo_de_vida}")
             print(f"  ➜ Protocolo    : {protocolo}")
             print(f"  ➜ Tamanho Total: {tamanho_total} bytes | Cabeçalho: {tamanho_cabecalho} bytes")
+
+#  ICMP #
+# Se for ICMP, extrai dados #
+            if protocolo == 1 and len(dados_transporte) >= 8:
+# Tipo do ICMP #
+                tipo_icmp = dados_transporte[0]     
+# Código ICMP #                           
+                codigo_icmp = dados_transporte[1]         
+# ID #                     
+                identificador = struct.unpack('!H', dados_transporte[4:6])[0]  
+# Sequência #
+                sequencia = struct.unpack('!H', dados_transporte[6:8])[0] 
+# Nome legível #     
+                nome_icmp = tipos_icmp.get(tipo_icmp, f"Tipo {tipo_icmp}")     
+
+                print("[Camada Transporte - ICMP]")
+                print(f"  ➜ Tipo        : {nome_icmp} ({tipo_icmp})")
+                print(f"  ➜ Código      : {codigo_icmp}")
+# Echo Request ou Reply #
+                if tipo_icmp in [0, 8]:  
+                    print(f"  ➜ Identificador: {identificador}")
+                    print(f"  ➜ Sequência    : {sequencia}")
+
+#  UDP #
+# Extrai portas de origem e destino do cabeçalho UDP #
+            elif protocolo == 17 and len(dados_transporte) >= 8:
+# Portas #
+                porta_origem, porta_destino = struct.unpack('!HH', dados_transporte[:4])  
+                print("[Camada Transporte - UDP]")
+                print(f"  ➜ Porta de Origem : {porta_origem}")
+                print(f"  ➜ Porta de Destino: {porta_destino}")
+
+#  TCP #
+# Extrai dados #
+            elif protocolo == 6 and len(dados_transporte) >= 20:
+                porta_origem, porta_destino, numero_seq, numero_ack, dados_flags = struct.unpack('!HHIIH', dados_transporte[:14])
+# Tamanho do cabeçalho TCP #
+                tamanho_tcp = (dados_flags >> 12) * 4   
+# Flags (SYN, ACK) #                    
+                flags_tcp = dados_flags & 0x01FF                
+#  Tamanho da janela #           
+                janela_tcp = struct.unpack('!H', dados_transporte[14:16])[0] 
+# Dados da camada de aplicação #
+ 
+                dados_aplicacao = dados_transporte[tamanho_tcp:]              
+                print("[Camada Transporte - TCP]")
+                print(f"  ➜ Porta de Origem : {porta_origem}")
+                print(f"  ➜ Porta de Destino: {porta_destino}")
+                print(f"  ➜ Número Seq      : {numero_seq}")
+                print(f"  ➜ Número ACK      : {numero_ack}")
+                print(f"  ➜ Flags           : {flags_tcp:#04x}")
+                print(f"  ➜ Janela          : {janela_tcp}")
+
+# Se flag ACK estiver e tiver carga de dados #
+                if flags_tcp & 0x10 and dados_aplicacao:
+                    print("[Camada Aplicação - Dados]")
+                    print(f"  ➜ Dados (máx. 200 bytes): {dados_aplicacao[:200]}")
+
