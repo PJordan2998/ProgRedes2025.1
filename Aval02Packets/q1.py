@@ -71,3 +71,27 @@ with open(nome_arquivo, 'rb') as arquivo_pcap:
             print(f"  ➜ Código de operação: {codigo_operacao} ({'ARP' if codigo_operacao in [1, 2] else 'RARP'})")
             print(f"  ➜ Remetente         : MAC {remetente_mac}, IP {remetente_ip}")
             print(f"  ➜ Destinatário      : MAC {destinatario_mac}, IP {destinatario_ip}")
+
+#  IPv4 #
+        elif tipo_ethernet == 0x0800 and len(dados_rede) >= 20:
+# Versão e tamanho do cabeçalho #
+            versao_ihl = dados_rede[0]
+# Extrai tamanho do cabeçalho #                            
+            tamanho_cabecalho = (versao_ihl & 0x0F) * 4
+# TTL #          
+            tempo_de_vida = dados_rede[8]
+# Protocolo (1 = ICMP, 6 = TCP, 17 = UDP) #                         
+            protocolo = dados_rede[9]                             
+            ip_origem = '.'.join(str(b) for b in dados_rede[12:16])
+            ip_destino = '.'.join(str(b) for b in dados_rede[16:20])
+# Tamanho total do pacote #
+            tamanho_total = struct.unpack('!H', dados_rede[2:4])[0]
+# Dados da camada de transporte #  
+            dados_transporte = dados_rede[tamanho_cabecalho:]        
+
+            print("[Camada Rede - IPv4]")
+            print(f"  ➜ IP de Origem : {ip_origem}")
+            print(f"  ➜ IP de Destino: {ip_destino}")
+            print(f"  ➜ TTL          : {tempo_de_vida}")
+            print(f"  ➜ Protocolo    : {protocolo}")
+            print(f"  ➜ Tamanho Total: {tamanho_total} bytes | Cabeçalho: {tamanho_cabecalho} bytes")
