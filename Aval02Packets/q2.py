@@ -49,3 +49,14 @@ for i in range(quantidade_tags):
     if identificador_tag == 0x8825:
         offset_gps_info = ler_32bits(dados_ifd0, pos + 8)
         break
+
+if offset_gps_info is None:
+    print("Erro: A imagem não contém informações de localização GPS.")
+    sys.exit()
+
+dados_gps = dados_exif[offset_gps_info:]
+quantidade_tags_gps = ler_16bits(dados_gps, 0)
+
+# Inicializa dados de coordenadas
+latitude = longitude = None
+referencia_lat = referencia_lon = None
