@@ -33,3 +33,19 @@ if modo_little_endian:
 else:
     ler_16bits = lambda b, o: (b[o] << 8) + b[o+1]
     ler_32bits = lambda b, o: (b[o] << 24) + (b[o+1] << 16) + (b[o+2] << 8) + b[o+3]
+
+
+# Encontra o primeiro diretório da imagem#
+offset_ifd0 = ler_32bits(dados_exif, 4)
+dados_ifd0 = dados_exif[offset_ifd0:]
+quantidade_tags = ler_16bits(dados_ifd0, 0)
+
+offset_gps_info = None
+
+# Localiza a localização do GPS #
+for i in range(quantidade_tags):
+    pos = 2 + i * 12
+    identificador_tag = ler_16bits(dados_ifd0, pos)
+    if identificador_tag == 0x8825:
+        offset_gps_info = ler_32bits(dados_ifd0, pos + 8)
+        break
