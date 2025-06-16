@@ -57,6 +57,14 @@ if offset_gps_info is None:
 dados_gps = dados_exif[offset_gps_info:]
 quantidade_tags_gps = ler_16bits(dados_gps, 0)
 
-# Inicializa dados de coordenadas
+# Inicializa dados de coordenadas #
 latitude = longitude = None
 referencia_lat = referencia_lon = None
+
+# Lê as entradas das coordenadas #
+for i in range(quantidade_tags_gps):
+    pos = 2 + i * 12
+    id_tag = ler_16bits(dados_gps, pos)
+    tipo_dado = ler_16bits(dados_gps, pos + 2)
+    total_valores = ler_32bits(dados_gps, pos + 4)
+    offset_valores = ler_32bits(dados_gps, pos + 8)
