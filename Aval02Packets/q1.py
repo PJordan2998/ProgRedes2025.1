@@ -57,3 +57,17 @@ with open(nome_arquivo, 'rb') as arquivo_pcap:
         print(f"  ➜ MAC de Origem : {mac_origem}")
         print(f"  ➜ MAC de Destino: {mac_destino}")
         print(f"  ➜ Tipo Ethernet : {tipo_ethernet:#06x}")
+
+#  ARP / RARP #
+# Se for protocolo ARP (0x0806), extrai: Operação (1 = request, 2 = reply) e MAC e IP do remetente e destinatário #
+        if tipo_ethernet == 0x0806 and len(dados_rede) >= 28:
+            codigo_operacao = struct.unpack('!H', dados_rede[6:8])[0]  # Código ARP ou RARP
+            remetente_mac = ':'.join('{:02x}'.format(b) for b in dados_rede[8:14])
+            remetente_ip = '.'.join(str(b) for b in dados_rede[14:18])
+            destinatario_mac = ':'.join('{:02x}'.format(b) for b in dados_rede[18:24])
+            destinatario_ip = '.'.join(str(b) for b in dados_rede[24:28])
+
+            print("[Camada Rede - ARP/RARP]")
+            print(f"  ➜ Código de operação: {codigo_operacao} ({'ARP' if codigo_operacao in [1, 2] else 'RARP'})")
+            print(f"  ➜ Remetente         : MAC {remetente_mac}, IP {remetente_ip}")
+            print(f"  ➜ Destinatário      : MAC {destinatario_mac}, IP {destinatario_ip}")
