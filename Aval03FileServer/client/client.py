@@ -69,3 +69,12 @@ def continuar_download(conexao, arquivo):
     else:
 # Exibe mensagem de erro recebida do servidor                                  
         print(resposta)                                    
+
+# Função para listar arquivos disponíveis no servidor
+def mostrar_lista(conexao):          
+# Envia comando de listagem                      
+    conexao.sendall(b'DIR\n')           
+# Recebe a lista de arquivos                   
+    lista = conexao.recv(TAM_BUFFER).decode()       
+# Exibe a lista       
+    print(lista)                                           
