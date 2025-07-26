@@ -35,4 +35,37 @@ def baixar_arquivo(conexao, arquivo):
         print("Arquivo baixado com sucesso.")      
 # Exibe mensagem de erro recebida do servidor        
     else:
+        print(resposta)  
+
+# Função para retomar o download de um arquivo
+def continuar_download(conexao, arquivo):           
+# Verifica o tamanho já baixado       
+    inicio = os.path.getsize(arquivo) if os.path.exists(arquivo) else 0  
+# Solicita ao servidor o restante do arquivo
+    conexao.sendall(f'DRA {arquivo} {inicio}\n'.encode()) 
+# Recebe a resposta do servidor
+    resposta = conexao.recv(TAM_BUFFER).decode()        
+# Se a resposta for positiva     
+    if resposta.startswith("OK"):    
+# Pega o tamanho restante a ser baixado               
+        restante = int(resposta.split()[1])  
+# Abre o arquivo para acrescentar dados              
+        with open(arquivo, 'ab') as destino:      
+# Inicializa o total de bytes recebidos nesta etapa         
+            recebido = 0                        
+# Continua até receber tudo               
+            while recebido < restante:      
+# Recebe um bloco de dados               
+                dados = conexao.recv(min(TAM_BUFFER, restante - recebido)) 
+# Se não receber nada, interrompe
+                if not dados:                              
+                    break
+# Escreve o bloco no arquivo
+                destino.write(dados)    
+# Atualiza o total recebido                  
+                recebido += len(dados)     
+# Informa que o download foi concluído                
+        print("Download retomado e finalizado.")           
+    else:
+# Exibe mensagem de erro recebida do servidor                                  
         print(resposta)                                    
