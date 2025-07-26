@@ -22,4 +22,21 @@ def enviar_arquivo(conn, caminho):
             if not dados:                               
                 break
 # Envia o bloco lido para o cliente
-            conn.sendall(dados)                         
+            conn.sendall(dados)     
+
+def enviar_parcial(conn, caminho, offset):
+# Calcula o tamanho restante a ser enviado
+    tamanho = os.path.getsize(caminho) - offset   
+# Envia confirmação e tamanho restante      
+    conn.sendall(f"OK {tamanho}\n".encode())   
+# Abre o arquivo em modo binário         
+    with open(caminho, 'rb') as f:    
+# Move o ponteiro para o offset informado                  
+        f.seek(offset)                                  
+        while True:
+# Lê um bloco a partir do offset
+            dados = f.read(BUFFER)                      
+            if not dados:
+                break
+# Envia o bloco lido  
+            conn.sendall(dados)                                           
