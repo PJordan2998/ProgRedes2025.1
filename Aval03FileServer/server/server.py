@@ -39,4 +39,20 @@ def enviar_parcial(conn, caminho, offset):
             if not dados:
                 break
 # Envia o bloco lido  
-            conn.sendall(dados)                                           
+            conn.sendall(dados)     
+
+def enviar_md5(conn, caminho, offset, qtd_bytes):
+    try:
+# Abre o arquivo em modo binário
+        with open(caminho, 'rb') as f:    
+# Move o ponteiro para o offset              
+            f.seek(offset)   
+# Lê a quantidade de bytes solicitada                            
+            dados = f.read(qtd_bytes)    
+# Calcula o hash MD5 dos dados lidos             
+        md5 = hashlib.md5(dados).hexdigest()    
+ # Envia o resultado para o cliente       
+        conn.sendall(f"MD5 {md5}\n".encode())   
+# Em caso de erro, envia mensagem de erro                                            
+    except Exception as e:
+        conn.sendall(f"ERRO {str(e)}\n".encode())       
