@@ -77,4 +77,103 @@ def mostrar_lista(conexao):
 # Recebe a lista de arquivos                   
     lista = conexao.recv(TAM_BUFFER).decode()       
 # Exibe a lista       
-    print(lista)                                           
+    print(lista)       
+
+# Função para solicitar o cálculo do MD5 parcial
+def calcular_md5(conexao, arquivo):     
+# Solicita ao usuário o byte inicial                   
+    inicio = input("Informe o byte inicial: ")   
+# Solicita ao usuário a quantidade de bytes          
+    quantidade = input("Informe a quantidade de bytes: ")  
+# Envia comando ao servidor
+    conexao.sendall(f'MD5 {arquivo} {inicio} {quantidade}\n'.encode()) 
+# Exibe o resultado recebido
+    print(conexao.recv(TAM_BUFFER).decode())               
+
+# Função para baixar arquivos por padrão/máscara
+def baixar_por_mascara(conexao, filtro):     
+# Envia comando com o filtro              
+    conexao.sendall(f'DMA {filtro}\n'.encode())    
+# Loop para receber múltiplos arquivos        
+    while True:     
+# Recebe resposta do servidor                                       
+        resposta = conexao.recv(TAM_BUFFER).decode()  
+# Se for o fim da transferência, sai do loop     
+        if resposta.startswith("FIM"):                     
+            break
+# Se for início de um arquivo
+        elif resposta.startswith("ARQUIVO"):    
+# Divide a resposta em partes           
+            partes = resposta.strip().split()      
+# Pega o nome do arquivo        
+            nome_arq = partes[1]             
+# Pega o tamanho do arquivo              
+            tam_arq = int(partes[3])               
+# Abre o arquivo para escrita        
+            with open(nome_arq, 'wb') as destino:   
+# Inicializa o total recebido       
+                recebido = 0              
+# Continua até receber tudo                 
+                while recebido < tam_arq:                  
+# Recebe bloco de dados
+                    dados = conexao.recv(min(TAM_BUFFER, tam_arq - recebido)) 
+# Escreve no arquivo
+                    destino.write(dados)  
+# Atualiza o total recebido                 
+                    recebido += len(dados)           
+# Informa que o arquivo foi transferido      
+            print(f"{nome_arq} transferido.")              
+        else:
+# Exibe mensagens diversas do servidor
+            print(resposta)                                
+
+# Função para exibir o menu de opções ao usuário
+def exibir_menu(conexao):      
+# Dicionário de opções e funções correspondentes                            
+    opcoes = {                                             
+        '1': lambda: mostrar_lista(conexao),
+        '2': lambda: baixar_arquivo(conexao, input("Nome do arquivo: ")),
+        '3': lambda: continuar_download(conexao, input("Nome do arquivo: ")),
+        '4': lambda: calcular_md5(conexao, input("Nome do arquivo: ")),
+        '5': lambda: baixar_por_mascara(conexao, input("Padrão (*.txt, etc): "))
+    }
+# Loop principal do menu
+    while True:          
+# Exibe as opções                                  
+        print("\n1 - Listar arquivos")                     
+        print("2 - Baixar arquivo")
+        print("3 - Retomar download")
+        print("4 - MD5 parcial")
+        print("5 - Baixar por padrão")
+        print("6 - Sair")
+# Solicita a escolha do usuário
+        escolha = input("Opção: ")                         
+
+# Se escolher sair, encerra o loop
+        if escolha == '6':                                 
+            break
+# Busca a função correspondente à escolha
+        acao = opcoes.get(escolha)                         
+        if acao:
+# Executa a função escolhida
+            acao()                                         
+        else:
+# Informa se a opção for inválida
+            print("Escolha inválida.")                     
+
+# Função principal para iniciar o cliente
+def iniciar():                         
+# Cria o socket TCP                    
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as conexao: 
+        try:
+# Tenta conectar ao servidor
+            conexao.connect((HOST, PORTA))             
+# Exibe o menu de opções    
+            exibir_menu(conexao)        
+# Captura erros de conexão                   
+        except Exception as erro:       
+# Exibe mensagem de erro                   
+            print(f"Falha na conexão: {erro}")             
+
+if __name__ == '__main__':                                 
+    iniciar()                                                                                
