@@ -1,0 +1,20 @@
+Porta padrão: 50000
+
+Estrutura das Mensagens
+As mensagens de cliente e servidor usam formato em UTF-8.
+
+Comandos:
+* DIR: Lista todos os arquivos disponíveis no diretório de compartilhamento do servidor, em linhas separadas. 
+
+* DOW <nome_arquivo>: Download completo de um arquivo.
+ 
+* DRA <nome_arquivo> <offset>: Download com retomada a partir de um determinado byte.
+
+* MD5 <nome_arquivo> <offset> <tamanho>: Retorna o hash MD5 de uma parte do arquivo.
+ 
+* DMA <mascara>: Download múltiplo de arquivos que atendem à máscara.
+
+
+*	Se nenhum arquivo for localizado apresenta: ERRO Nenhum arquivo correspondente
+*	Atende múltiplos clientes simultaneamente via multithreading.
+
