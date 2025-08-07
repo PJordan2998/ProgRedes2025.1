@@ -176,4 +176,4 @@ def iniciar():
             print(f"Falha na conexão: {erro}")             
 
 if __name__ == '__main__':                                 
-    iniciar()                                                                                
+    iniciar()                                                

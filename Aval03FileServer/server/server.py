@@ -173,7 +173,7 @@ def main():
             conn, addr = servidor.accept()   
 # Chama a função para tratar o cliente              
             tratar_cliente(conn, addr)                     
-#            
+            
 if __name__ == '__main__':
     main()                                                 
   
