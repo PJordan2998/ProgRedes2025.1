@@ -1,20 +1,12 @@
-Porta padrão: 50000
-
-Estrutura das Mensagens
-As mensagens de cliente e servidor usam formato em UTF-8.
-
-Comandos:
-* DIR: Lista todos os arquivos disponíveis no diretório de compartilhamento do servidor, em linhas separadas. 
-
-* DOW <nome_arquivo>: Download completo de um arquivo.
- 
-* DRA <nome_arquivo> <offset>: Download com retomada a partir de um determinado byte.
-
-* MD5 <nome_arquivo> <offset> <tamanho>: Retorna o hash MD5 de uma parte do arquivo.
- 
-* DMA <mascara>: Download múltiplo de arquivos que atendem à máscara.
-
-
-*	Se nenhum arquivo for localizado apresenta: ERRO Nenhum arquivo correspondente
-*	Atende múltiplos clientes simultaneamente via multithreading.
+| **Comando**                | **Direção**        | **Significado**                                                                                                | **Parâmetros**                                                                                                                                                       |
+| -------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DIR`                      | Cliente → Servidor | Solicita a listagem de todos os arquivos disponíveis no diretório do servidor.                                 | Nenhum. O servidor responde com uma lista de nomes de arquivos separados por `\n`.                                                                                   |
+| `DOW nome`                 | Cliente → Servidor | Solicita o **download completo** de um arquivo.                                                                | `nome` (string): nome do arquivo solicitado. <br> O servidor responde com: `OK tamanho` seguido do conteúdo do arquivo em bytes, ou `ERRO` se não existir.           |
+| `DRA nome offset`          | Cliente → Servidor | Solicita o **download parcial** de um arquivo, a partir de um determinado byte.                                | `nome` (string): nome do arquivo. <br> `offset` (int): posição inicial (em bytes) de onde deve continuar o download.                                                 |
+| `MD5 nome offset tamanho`  | Cliente → Servidor | Solicita o **hash MD5** de um trecho de um arquivo.                                                            | `nome` (string): nome do arquivo. <br> `offset` (int): posição inicial. <br> `tamanho` (int): número de bytes a considerar. <br> O servidor responde com o hash MD5. |
+| `DMA máscara`              | Cliente → Servidor | Solicita o **download em lote** de todos os arquivos que correspondem a uma determinada máscara (ex: `*.txt`). | `máscara` (string): padrão a ser usado. <br> O servidor envia para cada arquivo: `ARQUIVO nome TAM tamanho`, seguido dos dados. Finaliza com `FIM`.                  |
+| `ERRO msg`                 | Servidor → Cliente | Indica que houve um erro ao processar o comando.                                                               | `msg` (string): descrição do erro (ex: "Arquivo não encontrado").                                                                                                    |
+| `OK tamanho`               | Servidor → Cliente | Confirma que o arquivo existe e informa seu tamanho, antes de enviar os dados.                                 | `tamanho` (int): número total de bytes do arquivo.                                                                                                                   |
+| `ARQUIVO nome TAM tamanho` | Servidor → Cliente | Mensagem usada durante o `DMA`, para indicar que um arquivo será enviado.                                      | `nome` (string), `tamanho` (int). Depois dessa linha, o conteúdo é enviado em binário.                                                                               |
+| `FIM`                      | Servidor → Cliente | Indica o fim do envio no comando `DMA`.                                                                        | Nenhum. Serve para o cliente saber que não há mais arquivos a serem recebidos.                                                                                       |
 
