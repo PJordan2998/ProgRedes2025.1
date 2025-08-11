@@ -103,11 +103,11 @@ def tratar_cliente(conn, addr):
 # Monta a lista de arquivos
                 lista = '\n'.join(os.listdir(PASTA)) + '\n' 
 # Envia a lista para o cliente
-                conn.sendall(lista.encode())
-                print(PASTA)              
+                conn.sendall(lista.encode())        
+                print(PASTA)     
             elif cmd == 'DOW' and len(partes) == 2:
 # Pega o nome do arquivo solicitado
-                nome = partes[1]                
+                nome = partes[1]               
 # Monta o caminho completo           
                 caminho = os.path.join(PASTA, nome)  
 # Verifica se o arquivo existe      
