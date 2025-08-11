@@ -103,7 +103,8 @@ def tratar_cliente(conn, addr):
 # Monta a lista de arquivos
                 lista = '\n'.join(os.listdir(PASTA)) + '\n' 
 # Envia a lista para o cliente
-                conn.sendall(lista.encode())                
+                conn.sendall(lista.encode())
+                print(PASTA)              
             elif cmd == 'DOW' and len(partes) == 2:
 # Pega o nome do arquivo solicitado
                 nome = partes[1]                
