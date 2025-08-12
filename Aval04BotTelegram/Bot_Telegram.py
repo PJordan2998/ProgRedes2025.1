@@ -12,7 +12,7 @@ USUARIOS_CADASTRADOS = {}
 USUARIOS_LOCK = threading.Lock()
 
 # busca atualizações das mensagens do bot, através da URL da API, realiza requisições GET
-def obter_atualizacoes(token, offset=None):
+def obter_atualizacoes_CHAT(token, offset=None):
     url = f'https://api.telegram.org/bot{token}/getUpdates'
     parametros = {'timeout': 3, 'offset': offset}
     try:
@@ -24,7 +24,7 @@ def obter_atualizacoes(token, offset=None):
         return {}
 
 # Envia mensagens ao chat, através da URL da API
-def enviar_mensagem(token, id_chat, texto):
+def enviar_mensagens(token, id_chat, texto):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     dados = {'chat_id': id_chat, 'text': texto}
     try:
@@ -33,7 +33,7 @@ def enviar_mensagem(token, id_chat, texto):
         print(f"Erro ao enviar mensagem: {erro}")
 
 # Comandos para teste de redes, ping, netstat, route, ipconfig e tracert
-def executar_comando(comando, argumentos):
+def executar_comando_redes(comando, argumentos):
     if comando == '/ping':
         host = argumentos[0] if argumentos else '8.8.8.8'
         try:
@@ -70,7 +70,7 @@ def executar_comando(comando, argumentos):
         return 'Comando não reconhecido.'
 
 # Manda mensagem de boas-vindas para usuários que já interagiram com o bot mas ainda não estão cadastrados.
-def enviar_boas_vindas_para_chats_ativos():
+def enviar_mensagem_inicial_chats_():
     for token in TOKENS:
         atualizacoes = obter_atualizacoes(token)
         if 'result' in atualizacoes:
@@ -83,4 +83,4 @@ def enviar_boas_vindas_para_chats_ativos():
                 chave_usuario = (token, id_usuario)
                 with USUARIOS_LOCK:
                     if chave_usuario not in USUARIOS_CADASTRADOS:
-                        enviar_mensagem(token, id_chat, "Bem-vindo! Por favor, envie seu nome para cadastro.")
+                        enviar_mensagem(token, id_chat, "Bem-vindo novo usuário! Envie seu nome para cadastro.")
