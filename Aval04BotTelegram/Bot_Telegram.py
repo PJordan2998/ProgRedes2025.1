@@ -44,26 +44,26 @@ def executar_comando_redes(comando, argumentos):
     elif comando == '/netstat':
         try:
             saida = subprocess.check_output(['netstat', '-an'], text=True)
-            return saida[:4000]
+            return saida[:300]
         except Exception as erro:
             return f'Erro ao executar netstat: {erro}'
     elif comando == '/route':
         try:
             saida = subprocess.check_output(['route', 'print'], text=True)
-            return saida[:4000]
+            return saida[:300]
         except Exception as erro:
             return f'Erro ao executar route: {erro}'
     elif comando == '/ipconfig':
         try:
             saida = subprocess.check_output(['ipconfig'], text=True)
-            return saida[:4000]
+            return saida[:300]
         except Exception as erro:
             return f'Erro ao executar ipconfig: {erro}'
     elif comando == '/tracert':
         host = argumentos[0] if argumentos else '8.8.8.8'
         try:
             saida = subprocess.check_output(['tracert', host], text=True)
-            return saida[:4000]
+            return saida[:300]
         except Exception as erro:
             return f'Erro ao executar tracert: {erro}'
     else:
