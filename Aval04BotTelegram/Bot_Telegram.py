@@ -31,3 +31,40 @@ def enviar_mensagem(token, id_chat, texto):
         requests.post(url, data=dados, timeout=3)
     except Exception as erro:
         print(f"Erro ao enviar mensagem: {erro}")
+
+# Comandos para teste de redes, ping, netstat, route, ipconfig e tracert
+def executar_comando(comando, argumentos):
+    if comando == '/ping':
+        host = argumentos[0] if argumentos else '8.8.8.8'
+        try:
+            saida = subprocess.check_output(['ping', '-n', '4', host], text=True)
+            return saida
+        except Exception as erro:
+            return f'Erro ao executar ping: {erro}'
+    elif comando == '/netstat':
+        try:
+            saida = subprocess.check_output(['netstat', '-an'], text=True)
+            return saida[:4000]
+        except Exception as erro:
+            return f'Erro ao executar netstat: {erro}'
+    elif comando == '/route':
+        try:
+            saida = subprocess.check_output(['route', 'print'], text=True)
+            return saida[:4000]
+        except Exception as erro:
+            return f'Erro ao executar route: {erro}'
+    elif comando == '/ipconfig':
+        try:
+            saida = subprocess.check_output(['ipconfig'], text=True)
+            return saida[:4000]
+        except Exception as erro:
+            return f'Erro ao executar ipconfig: {erro}'
+    elif comando == '/tracert':
+        host = argumentos[0] if argumentos else '8.8.8.8'
+        try:
+            saida = subprocess.check_output(['tracert', host], text=True)
+            return saida[:4000]
+        except Exception as erro:
+            return f'Erro ao executar tracert: {erro}'
+    else:
+        return 'Comando não reconhecido.'
