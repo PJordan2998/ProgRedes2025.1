@@ -68,3 +68,19 @@ def executar_comando(comando, argumentos):
             return f'Erro ao executar tracert: {erro}'
     else:
         return 'Comando não reconhecido.'
+
+# Manda mensagem de boas-vindas para usuários que já interagiram com o bot mas ainda não estão cadastrados.
+def enviar_boas_vindas_para_chats_ativos():
+    for token in TOKENS:
+        atualizacoes = obter_atualizacoes(token)
+        if 'result' in atualizacoes:
+            for item in atualizacoes['result']:
+                mensagem = item.get('message')
+                if not mensagem:
+                    continue
+                id_chat = mensagem['chat']['id']
+                id_usuario = mensagem['from']['id']
+                chave_usuario = (token, id_usuario)
+                with USUARIOS_LOCK:
+                    if chave_usuario not in USUARIOS_CADASTRADOS:
+                        enviar_mensagem(token, id_chat, "Bem-vindo! Por favor, envie seu nome para cadastro.")
