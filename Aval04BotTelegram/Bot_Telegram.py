@@ -11,7 +11,7 @@ TOKENS = [
 USUARIOS_CADASTRADOS = {}
 USUARIOS_LOCK = threading.Lock()
 
-# busca atualizações do bot, através da URL da API, realiza requisições GET
+# busca atualizações das mensagens do bot, através da URL da API, realiza requisições GET
 def obter_atualizacoes(token, offset=None):
     url = f'https://api.telegram.org/bot{token}/getUpdates'
     parametros = {'timeout': 3, 'offset': offset}
