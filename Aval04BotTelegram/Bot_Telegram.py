@@ -84,3 +84,63 @@ def enviar_mensagem_inicial_chats_():
                 with USUARIOS_LOCK:
                     if chave_usuario not in USUARIOS_CADASTRADOS:
                         enviar_mensagem(token, id_chat, "Bem-vindo novo usuário! Envie seu nome para cadastro.")
+
+#Tratamento de cada usuário/bot, com threads
+def bot_thread(token):
+    ultimos_id = None
+    while True:
+        atualizacoes = obter_atualizacoes(token, ultimos_id)
+        if 'result' in atualizacoes:
+            for item in atualizacoes['result']:
+                ultimos_id = item['update_id'] + 1
+                mensagem = item.get('message')
+                if not mensagem:
+                    continue
+                id_chat = mensagem['chat']['id']
+                texto = mensagem.get('text', '')
+                id_usuario = mensagem['from']['id']
+
+                chave_usuario = (token, id_usuario)
+                with USUARIOS_LOCK:
+                    if chave_usuario not in USUARIOS_CADASTRADOS:
+                        if texto.startswith('/start'):
+                            enviar_mensagem(token, id_chat, "Bem-vindo! Por favor, envie seu nome para cadastro.")
+                        elif texto:
+                            USUARIOS_CADASTRADOS[chave_usuario] = texto.strip()
+                            enviar_mensagem(token, id_chat, f"Usuário {texto.strip()} cadastrado com sucesso!\nDigite /help para ver os comandos.")
+                        continue
+
+                if texto.startswith('/help'):
+                    texto_ajuda = (
+                        "Comandos disponíveis:\n"
+                        "/ping [host] - Testa conectividade\n"
+                        "/netstat - Mostra conexões de rede\n"
+                        "/route - Mostra tabela de rotas\n"
+                        "/ipconfig - Mostra interfaces de rede\n"
+                        "/tracert [host] - Mostra rota até o destino"
+                        )
+                    enviar_mensagem(token, id_chat, texto_ajuda)
+                elif texto.startswith('/'):
+                    partes = texto.split()
+                    comando = partes[0]
+                    argumentos = partes[1:]
+                    resultado = executar_comando(comando, argumentos)
+                    enviar_mensagem(token, id_chat, resultado)
+                else:
+                    enviar_mensagem(token, id_chat, "Comando não reconhecido. Digite /help para ver os comandos.")
+        time.sleep(0.5)
+
+# inicialização dos bots
+def principal():
+    print("Bots iniciados...")
+    enviar_boas_vindas_para_chats_ativos()
+    threads = []
+    for token in TOKENS:
+        t = threading.Thread(target=bot_thread, args=(token,), daemon=True)
+        t.start()
+        threads.append(t)
+    while True:
+        time.sleep(0.4)
+
+if __name__ == '__main__':
+    principal()
